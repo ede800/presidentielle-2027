@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Questionnaire : de quels candidats êtes-vous proche ? — Présidentielle 2027</title>
+  <meta name="description" content="Répondez à 24 affirmations sur l'économie, le social, l'écologie, l'immigration, la sécurité, l'Europe et les institutions, et découvrez votre proximité avec les candidats.">
+  <meta name="theme-color" content="#000091">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body data-page="questionnaire">
+  <div id="layout-header"></div>
+  <main id="contenu" tabindex="-1" role="main">
+    <div class="container"><nav class="breadcrumb" aria-label="Vous êtes ici :"><ol><li><a href="index.html">Accueil</a></li><li><span aria-current="page">Questionnaire</span></li></ol></nav></div>
+    <div class="container" style="max-width:52rem">
+      <div class="page-head">
+        <h1>De quels candidats êtes-vous le plus proche ?</h1>
+        <p class="lead">Situez vos idées par rapport aux propositions des candidats sur les grands sujets de la campagne.</p>
+      </div>
+      <div id="quiz" aria-live="off"></div>
+    </div>
+
+  </main>
+  <div id="layout-footer"></div>
+  <noscript><div class="container"><p class="callout callout--warning">Ce site a besoin de JavaScript pour afficher les données des partis, des candidats et le questionnaire. Le texte des pages reste lisible sans JavaScript.</p></div></noscript>
+  <script src="js/data.js"></script>
+  <script src="js/questionnaire-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

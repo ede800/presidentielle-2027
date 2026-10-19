@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Présidentielle 2027 — Guide citoyen des partis et des programmes</title>
+  <meta name="description" content="Guide indépendant et neutre : partis politiques français, candidats à l'élection présidentielle 2027, programmes détaillés, comparateur et questionnaire.">
+  <meta name="theme-color" content="#000091">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body data-page="accueil">
+  <div id="layout-header"></div>
+  <main id="contenu" tabindex="-1" role="main">
+    <div class="hero">
+      <div class="container">
+        <h1>Comprendre l'élection présidentielle de 2027</h1>
+        <p class="lead">Qui sont les partis politiques français ? Que proposent les candidats, thème par thème ? Ce guide indépendant vous aide à vous informer et à comparer, sans prendre parti.</p>
+        <div class="btn-group">
+          <a class="btn btn--lg" href="questionnaire.html">Faire le questionnaire</a>
+          <a class="btn btn--secondary btn--lg" href="candidats.html">Voir les programmes</a>
+        </div>
+      </div>
+    </div>
+
+    <section class="section" aria-labelledby="titre-chiffres">
+      <div class="container">
+        <h2 id="titre-chiffres">Le guide en chiffres</h2>
+        <ul class="grid grid--4" id="stats" style="list-style:none;padding:0"></ul>
+      </div>
+    </section>
+
+    <section class="section section--alt" aria-labelledby="titre-rubriques">
+      <div class="container">
+        <h2 id="titre-rubriques">Explorer le guide</h2>
+        <ul class="grid grid--3" style="list-style:none;padding:0">
+          <li><div class="card"><h3 class="card__title"><a href="election.html">L'élection présidentielle</a></h3><p class="card__desc">Calendrier, parrainages, déroulement du scrutin et règles de campagne.</p><span class="card__arrow" aria-hidden="true">→</span></div></li>
+          <li><div class="card"><h3 class="card__title"><a href="partis.html">Les partis politiques</a></h3><p class="card__desc">De l'extrême gauche à l'extrême droite : histoire, idéologie et dirigeants de chaque formation.</p><span class="card__arrow" aria-hidden="true">→</span></div></li>
+          <li><div class="card"><h3 class="card__title"><a href="candidats.html">Candidats et programmes</a></h3><p class="card__desc">Les propositions détaillées des principaux candidats sur neuf grands thèmes.</p><span class="card__arrow" aria-hidden="true">→</span></div></li>
+          <li><div class="card"><h3 class="card__title"><a href="comparateur.html">Comparateur thématique</a></h3><p class="card__desc">Mettez côte à côte les propositions des candidats sur un même sujet.</p><span class="card__arrow" aria-hidden="true">→</span></div></li>
+          <li><div class="card"><h3 class="card__title"><a href="questionnaire.html">Questionnaire</a></h3><p class="card__desc">Répondez à 24 affirmations et découvrez de quels candidats vos idées sont les plus proches.</p><span class="card__arrow" aria-hidden="true">→</span></div></li>
+          <li><div class="card"><h3 class="card__title"><a href="sources.html">Sources et méthodologie</a></h3><p class="card__desc">D'où viennent les informations, comment elles sont mises à jour et comment proposer une correction.</p><span class="card__arrow" aria-hidden="true">→</span></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="titre-voter">
+      <div class="container">
+        <h2 id="titre-voter">Pour voter, il faut être inscrit</h2>
+        <div class="callout">
+          <p>Vérifiez votre inscription sur les listes électorales et votre bureau de vote sur le site officiel service-public.fr. L'inscription est possible en ligne jusqu'au sixième vendredi précédant le scrutin.</p>
+          <p><a class="btn" href="https://www.service-public.fr/particuliers/vosdroits/services-en-ligne-et-formulaires/ISE" rel="noopener" target="_blank">Vérifier mon inscription<span class="sr-only"> (nouvelle fenêtre, site service-public.fr)</span></a></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <div id="layout-footer"></div>
+  <noscript><div class="container"><p class="callout callout--warning">Ce site a besoin de JavaScript pour afficher les données des partis, des candidats et le questionnaire. Le texte des pages reste lisible sans JavaScript.</p></div></noscript>
+  <script src="js/data.js"></script>
+  <script src="js/questionnaire-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

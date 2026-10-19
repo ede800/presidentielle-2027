@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sources et méthodologie — Présidentielle 2027</title>
+  <meta name="description" content="Sources utilisées, méthode de rédaction des programmes, calcul du questionnaire et procédure de correction.">
+  <meta name="theme-color" content="#000091">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body data-page="sources">
+  <div id="layout-header"></div>
+  <main id="contenu" tabindex="-1" role="main">
+    <div class="container"><nav class="breadcrumb" aria-label="Vous êtes ici :"><ol><li><a href="index.html">Accueil</a></li><li><span aria-current="page">Sources et méthodologie</span></li></ol></nav></div>
+    <div class="container" style="max-width:52rem">
+      <div class="page-head">
+        <h1>Sources et méthodologie</h1>
+        <p class="lead">Transparence sur la provenance des informations et sur la façon dont le questionnaire calcule vos résultats.</p>
+      </div>
+
+      <section class="section" aria-labelledby="t-neutralite">
+        <h2 id="t-neutralite">Principe de neutralité</h2>
+        <p>Ce guide n'a aucun lien avec un parti, un candidat ou une institution. Les candidats et partis sont présentés de la gauche vers la droite selon le positionnement usuellement retenu par les politologues et les médias, sans hiérarchie de valeur. Les propositions sont reformulées de manière factuelle, sans commentaire.</p>
+      </section>
+
+      <section class="section" aria-labelledby="t-programmes">
+        <h2 id="t-programmes">Comment les programmes sont-ils établis ?</h2>
+        <p>À la date de mise à jour, la plupart des candidats n'ont pas encore publié de programme complet pour 2027. Pour chaque candidat, les propositions retenues proviennent, par ordre de priorité :</p>
+        <ol>
+          <li>des annonces de campagne 2027 et du programme officiel lorsqu'il existe ;</li>
+          <li>des prises de position publiques récentes (interviews, propositions de loi, votes) ;</li>
+          <li>du programme précédent du candidat ou de sa formation (présidentielle 2022, européennes et législatives 2024), lorsqu'il n'a pas été démenti.</li>
+        </ol>
+        <p>Lorsqu'aucune proposition fiable n'a été trouvée sur un thème, la fiche l'indique plutôt que d'extrapoler.</p>
+      </section>
+
+      <section class="section" aria-labelledby="t-calcul">
+        <h2 id="t-calcul">Comment le questionnaire est-il calculé ?</h2>
+        <p>Pour chaque affirmation, la position de chaque candidat est codée sur une échelle de −2 (pas du tout d'accord) à +2 (tout à fait d'accord), à partir des propositions recensées. Lorsque la position d'un candidat est inconnue, la question est ignorée pour lui.</p>
+        <p>Pour chaque question à laquelle vous avez répondu, l'accord est égal à 1 moins l'écart entre votre réponse et la position du candidat, divisé par 4 (écart maximal). Une réponse identique vaut donc 100 %, une réponse opposée 0 %. Les questions marquées comme importantes comptent double. Le score final est la moyenne pondérée de ces accords.</p>
+        <p>Les réponses « Sans opinion » ne sont pas prises en compte. Vos réponses sont conservées uniquement dans le stockage local de votre navigateur, pour vous permettre de reprendre le questionnaire ; elles ne sont jamais transmises.</p>
+        <div class="callout callout--warning"><p>Ce codage est forcément une simplification. Un même candidat peut avoir une position nuancée, conditionnelle ou évolutive. Le questionnaire est un point de départ pour lire les programmes, pas un substitut.</p></div>
+      </section>
+
+      <section class="section" aria-labelledby="t-sources">
+        <h2 id="t-sources">Sources principales</h2>
+        <ul id="liste-sources"></ul>
+        <p>Les sites officiels des partis et des candidats font foi pour leurs propositions.</p>
+      </section>
+
+      <section class="section" aria-labelledby="t-corriger">
+        <h2 id="t-corriger">Signaler une erreur ou proposer une correction</h2>
+        <p>Ce site est un projet open source hébergé sur GitHub. Toute correction doit être accompagnée d'une source vérifiable (programme officiel, déclaration publique, article de presse). Ouvrez un ticket (« issue ») ou proposez directement une modification des fichiers <code>js/data.js</code> et <code>js/questionnaire-data.js</code>.</p>
+      </section>
+    </div>
+
+  </main>
+  <div id="layout-footer"></div>
+  <noscript><div class="container"><p class="callout callout--warning">Ce site a besoin de JavaScript pour afficher les données des partis, des candidats et le questionnaire. Le texte des pages reste lisible sans JavaScript.</p></div></noscript>
+  <script src="js/data.js"></script>
+  <script src="js/questionnaire-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

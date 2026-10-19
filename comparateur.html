@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comparateur des programmes — Présidentielle 2027</title>
+  <meta name="description" content="Comparez côte à côte les propositions des candidats à la présidentielle 2027 sur un même thème.">
+  <meta name="theme-color" content="#000091">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body data-page="comparateur">
+  <div id="layout-header"></div>
+  <main id="contenu" tabindex="-1" role="main">
+    <div class="container"><nav class="breadcrumb" aria-label="Vous êtes ici :"><ol><li><a href="index.html">Accueil</a></li><li><span aria-current="page">Comparateur</span></li></ol></nav></div>
+    <div class="container">
+      <div class="page-head">
+        <h1>Comparateur des programmes</h1>
+        <p class="lead">Choisissez un thème et les candidats à comparer. Les résultats se mettent à jour automatiquement.</p>
+      </div>
+
+      <form class="section--alt" style="padding:1.5rem;margin-bottom:1.5rem" aria-label="Paramètres de comparaison" onsubmit="return false">
+        <div class="form-group">
+          <label class="label" for="cmp-theme">Thème</label>
+          <select class="select" id="cmp-theme" style="max-width:28rem"></select>
+        </div>
+        <fieldset>
+          <legend class="fieldset__legend">Candidats à comparer</legend>
+          <div class="checks" id="cmp-candidats"></div>
+          <div class="btn-group" style="margin-top:1rem">
+            <button type="button" class="btn btn--tertiary btn--sm" id="cmp-tous">Tout sélectionner</button>
+            <button type="button" class="btn btn--tertiary btn--sm" id="cmp-aucun">Tout désélectionner</button>
+          </div>
+        </fieldset>
+      </form>
+
+      <p class="sr-only" id="cmp-statut" role="status" aria-live="polite"></p>
+      <div id="cmp-resultats"></div>
+    </div>
+
+  </main>
+  <div id="layout-footer"></div>
+  <noscript><div class="container"><p class="callout callout--warning">Ce site a besoin de JavaScript pour afficher les données des partis, des candidats et le questionnaire. Le texte des pages reste lisible sans JavaScript.</p></div></noscript>
+  <script src="js/data.js"></script>
+  <script src="js/questionnaire-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

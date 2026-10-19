@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Déclaration d'accessibilité — Présidentielle 2027</title>
+  <meta name="description" content="Déclaration d'accessibilité du guide citoyen Présidentielle 2027, établie selon le référentiel RGAA 4.1.">
+  <meta name="theme-color" content="#000091">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body data-page="accessibilite">
+  <div id="layout-header"></div>
+  <main id="contenu" tabindex="-1" role="main">
+    <div class="container"><nav class="breadcrumb" aria-label="Vous êtes ici :"><ol><li><a href="index.html">Accueil</a></li><li><span aria-current="page">Accessibilité</span></li></ol></nav></div>
+    <div class="container" style="max-width:52rem">
+      <div class="page-head">
+        <h1>Déclaration d'accessibilité</h1>
+        <p class="lead">Ce guide s'engage à rendre son contenu accessible à toutes et à tous, conformément au Référentiel général d'amélioration de l'accessibilité (RGAA) version 4.1.</p>
+      </div>
+
+      <section class="section" aria-labelledby="t-etat">
+        <h2 id="t-etat">État de conformité</h2>
+        <p>Le site est <strong>partiellement conforme</strong> avec le RGAA 4.1. Ce statut sera réévalué après un audit complet réalisé par une personne qualifiée ; seul un tel audit permet de déclarer une conformité totale.</p>
+      </section>
+
+      <section class="section" aria-labelledby="t-mesures">
+        <h2 id="t-mesures">Mesures mises en œuvre</h2>
+        <ul>
+          <li>Liens d'évitement vers le contenu, le menu et le pied de page.</li>
+          <li>Structure sémantique : régions (en-tête, navigation, contenu principal, pied de page), hiérarchie de titres cohérente, listes et tableaux balisés.</li>
+          <li>Navigation entièrement possible au clavier, avec un indicateur de focus visible.</li>
+          <li>Contrastes de couleurs conformes au niveau AA, en thème clair comme en thème sombre ; l'information n'est jamais transmise par la couleur seule.</li>
+          <li>Formulaires dotés d'étiquettes explicites, regroupements par <span lang="en">fieldset</span> et légende, messages d'erreur annoncés aux technologies d'assistance.</li>
+          <li>Questionnaire : déplacement du focus sur chaque nouvelle question, progression annoncée, résultats présentés sous forme de texte et de tableau.</li>
+          <li>Respect des préférences du système : réduction des animations, mode sombre, mode de contraste élevé de Windows.</li>
+          <li>Texte agrandissable jusqu'à 200 % sans perte de contenu, mise en page adaptée aux petits écrans.</li>
+          <li>Deux systèmes de navigation : menu principal et <a href="plan.html">plan du site</a>.</li>
+          <li>Liens ouvrant une nouvelle fenêtre signalés.</li>
+        </ul>
+      </section>
+
+      <section class="section" aria-labelledby="t-limites">
+        <h2 id="t-limites">Contenus non accessibles ou limites connues</h2>
+        <ul>
+          <li>Les données des partis, des candidats et le questionnaire nécessitent JavaScript.</li>
+          <li>Les pastilles de couleur des partis sont décoratives ; leur contraste avec le fond n'est pas garanti, mais le nom du parti est toujours indiqué en texte.</li>
+          <li>Le site n'a pas encore fait l'objet d'un audit externe ni de tests utilisateurs avec des personnes en situation de handicap.</li>
+        </ul>
+      </section>
+
+      <section class="section" aria-labelledby="t-env">
+        <h2 id="t-env">Technologies et environnement de test</h2>
+        <p>Technologies utilisées : HTML5, CSS, JavaScript, WAI-ARIA. Vérifications effectuées avec la navigation au clavier, les outils de développement des navigateurs et des lecteurs d'écran courants (NVDA avec Firefox, VoiceOver avec Safari).</p>
+      </section>
+
+      <section class="section" aria-labelledby="t-retour">
+        <h2 id="t-retour">Retour d'information et contact</h2>
+        <p>Si vous n'arrivez pas à accéder à un contenu ou à un service, signalez-le en ouvrant un ticket sur le dépôt GitHub du projet : nous chercherons une alternative ou une correction.</p>
+      </section>
+
+      <section class="section" aria-labelledby="t-recours">
+        <h2 id="t-recours">Voies de recours</h2>
+        <p>Ce site étant un projet indépendant, il ne relève pas des obligations légales applicables aux services publics. Pour toute question générale sur l'accessibilité numérique en France, vous pouvez consulter le site du <a href="https://www.defenseurdesdroits.fr/" rel="noopener" target="_blank">Défenseur des droits<span class="sr-only"> (nouvelle fenêtre)</span></a>.</p>
+      </section>
+    </div>
+
+  </main>
+  <div id="layout-footer"></div>
+  <noscript><div class="container"><p class="callout callout--warning">Ce site a besoin de JavaScript pour afficher les données des partis, des candidats et le questionnaire. Le texte des pages reste lisible sans JavaScript.</p></div></noscript>
+  <script src="js/data.js"></script>
+  <script src="js/questionnaire-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

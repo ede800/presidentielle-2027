@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Les partis politiques français — Présidentielle 2027</title>
+  <meta name="description" content="Présentation neutre des principaux partis politiques français : histoire, idéologie, direction et candidat à la présidentielle 2027.">
+  <meta name="theme-color" content="#000091">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body data-page="partis">
+  <div id="layout-header"></div>
+  <main id="contenu" tabindex="-1" role="main">
+    <div class="container"><nav class="breadcrumb" aria-label="Vous êtes ici :"><ol><li><a href="index.html">Accueil</a></li><li><span aria-current="page">Partis politiques</span></li></ol></nav></div>
+    <div class="container">
+      <div class="page-head">
+        <h1>Les partis politiques français</h1>
+        <p class="lead">Présentation des principales formations, classées de la gauche vers la droite selon le positionnement usuel. Ce classement est indicatif : plusieurs partis le contestent.</p>
+      </div>
+
+      <div class="spectrum" aria-hidden="true">
+        <div class="spectrum__axis"></div>
+        <div class="spectrum__labels"><span>Extrême gauche</span><span>Gauche</span><span>Centre</span><span>Droite</span><span>Extrême droite</span></div>
+      </div>
+
+      <form id="form-filtres" class="section--alt" style="padding:1.5rem;margin-bottom:1.5rem" role="search" aria-label="Filtrer les partis">
+        <div class="grid grid--2">
+          <div>
+            <label class="label" for="filtre-famille">Famille politique</label>
+            <select class="select" id="filtre-famille"></select>
+          </div>
+          <div>
+            <label class="label" for="filtre-texte">Rechercher <span class="hint">Nom, sigle, dirigeant ou courant (ex. : écologie)</span></label>
+            <input class="input" type="search" id="filtre-texte" autocomplete="off">
+          </div>
+        </div>
+      </form>
+
+      <p class="count" id="nb-partis" role="status" aria-live="polite"></p>
+      <ul class="grid grid--2" id="liste-partis" style="list-style:none;padding:0"></ul>
+    </div>
+
+  </main>
+  <div id="layout-footer"></div>
+  <noscript><div class="container"><p class="callout callout--warning">Ce site a besoin de JavaScript pour afficher les données des partis, des candidats et le questionnaire. Le texte des pages reste lisible sans JavaScript.</p></div></noscript>
+  <script src="js/data.js"></script>
+  <script src="js/questionnaire-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

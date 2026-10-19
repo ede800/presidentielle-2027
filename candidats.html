@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidats et programmes — Présidentielle 2027</title>
+  <meta name="description" content="Les candidats déclarés à l'élection présidentielle 2027 et leurs programmes détaillés : économie, social, écologie, immigration, sécurité, Europe, institutions.">
+  <meta name="theme-color" content="#000091">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <script>try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+</head>
+<body data-page="candidats">
+  <div id="layout-header"></div>
+  <main id="contenu" tabindex="-1" role="main">
+    <div class="container"><nav class="breadcrumb" aria-label="Vous êtes ici :"><ol><li><a href="index.html">Accueil</a></li><li><span aria-current="page">Candidats et programmes</span></li></ol></nav></div>
+    <div class="container">
+      <div class="page-head">
+        <h1>Candidats et programmes</h1>
+        <p class="lead">Les principaux candidats déclarés et leurs propositions, thème par thème. Les candidats sont présentés de la gauche vers la droite, sans hiérarchie.</p>
+      </div>
+
+      <div class="callout">
+        <p>À ce stade, aucun candidat n'est officiellement qualifié : la liste définitive sera publiée par le Conseil constitutionnel en mars 2027, après vérification des 500 parrainages.</p>
+      </div>
+
+      <section class="section" aria-labelledby="t-principaux">
+        <h2 id="t-principaux">Principaux candidats</h2>
+        <ul class="grid grid--3" id="liste-candidats" style="list-style:none;padding:0"></ul>
+      </section>
+
+      <section class="section" aria-labelledby="t-autres">
+        <h2 id="t-autres">Autres candidatures déclarées</h2>
+        <p>Ces candidats ont annoncé leur intention de se présenter. Leurs programmes sont résumés plus brièvement.</p>
+        <div class="table-wrap" tabindex="0" role="region" aria-labelledby="cap-autres">
+          <table>
+            <caption id="cap-autres" class="sr-only">Autres candidatures déclarées à l'élection présidentielle 2027</caption>
+            <thead><tr><th scope="col">Candidat</th><th scope="col">Parti ou étiquette</th><th scope="col">Positionnement et date d'annonce</th></tr></thead>
+            <tbody id="autres-candidats"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+  </main>
+  <div id="layout-footer"></div>
+  <noscript><div class="container"><p class="callout callout--warning">Ce site a besoin de JavaScript pour afficher les données des partis, des candidats et le questionnaire. Le texte des pages reste lisible sans JavaScript.</p></div></noscript>
+  <script src="js/data.js"></script>
+  <script src="js/questionnaire-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
