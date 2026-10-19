@@ -312,6 +312,16 @@
         "</div></li>";
     }).join("");
 
+    var bonus = $("#liste-fictifs");
+    if (bonus) bonus.innerHTML = (G.fictifs || []).map(function (c) {
+      return '<li><div class="card card--fiction">' +
+        '<div class="profile" style="margin-bottom:1rem">' + avatar(c, "md") +
+        '<div><h3 class="card__title" style="margin:0"><a href="candidat.html?id=' + c.id + '">' + esc(c.nom) + "</a></h3>" +
+        '<p class="mention" style="margin:0">' + esc(c.familleLabel) + "</p></div></div>" +
+        '<p class="card__desc"><span class="badge badge--fiction">Fiction</span> ' + esc(c.statut) + "</p>" +
+        '<span class="card__arrow" aria-hidden="true">→</span></div></li>';
+    }).join("");
+
     $("#autres-candidats").innerHTML = G.autres.map(function (a) {
       return '<tr><th scope="row"><span class="person">' + avatar(a, "sm") + esc(a.nom) + "</span></th><td>" + esc(a.parti) + "</td><td>" + esc(a.resume) + "</td></tr>";
     }).join("");
@@ -319,15 +329,15 @@
 
   function pageCandidat() {
     var id = new URLSearchParams(window.location.search).get("id");
-    var c = byId(G.candidats, id);
+    var c = byId(G.candidats, id) || byId(G.fictifs || [], id);
     var root = $("#fiche");
     if (!c) {
       document.title = "Candidat introuvable — Présidentielle 2027";
       root.innerHTML = '<h1>Candidat introuvable</h1><p>Cette fiche n\'existe pas ou a été déplacée.</p><p><a class="btn" href="candidats.html">Voir tous les candidats</a></p>';
       return;
     }
-    var p = parti(c.parti);
-    document.title = c.nom + " : programme — Présidentielle 2027";
+    var p = c.fictif ? null : parti(c.parti);
+    document.title = c.nom + (c.fictif ? " (fiction)" : "") + " : programme — Présidentielle 2027";
     $("#ariane-courant").textContent = c.nom;
 
     var themesPresents = G.themes.filter(function (t) { return c.programme[t.id]; });
@@ -336,11 +346,13 @@
     root.innerHTML =
       '<div class="profile" style="margin-bottom:1.5rem">' +
       (portrait(c) ? '<figure class="portrait">' + avatar(c, "lg") + '<figcaption class="portrait__credit">' + credit(c) + "</figcaption></figure>" : avatar(c, "lg")) +
-      "<div><h1 style=\"margin-bottom:.5rem\">" + esc(c.nom) + "</h1>" +
-      '<p class="lead" style="margin:0">' + esc(p.nom) + " (" + esc(p.sigle) + ") · " + esc(famille(p.famille).label) + "</p>" +
+      "<div><h1 style=\"margin-bottom:.5rem\">" + esc(c.nom) + (c.fictif ? ' <span class="badge badge--fiction">Fiction</span>' : "") + "</h1>" +
+      '<p class="lead" style="margin:0">' + (c.fictif ? esc(c.partiLabel) + " · " + esc(c.familleLabel) : esc(p.nom) + " (" + esc(p.sigle) + ") · " + esc(famille(p.famille).label)) + "</p>" +
       '<p class="mention" style="margin:0">' + esc(c.statut) + (c.slogan ? " · Slogan : " + esc(c.slogan) : "") + "</p></div></div>" +
       '<p class="highlight">' + esc(c.bio) + "</p>" +
-      '<div class="callout"><p>Les propositions ci-dessous synthétisent les annonces de campagne, les prises de position publiques et, le cas échéant, le programme précédent du candidat ou de sa formation. Le programme officiel 2027 peut évoluer.</p></div>' +
+      (c.fictif
+        ? '<div class="callout callout--warning"><p><strong>Personnage de fiction.</strong> Cette fiche est un clin d’œil au manga <i>Hunter × Hunter</i>. Pariston Hill n’est pas candidat à l’élection présidentielle : il n’apparaît ni dans le comparateur ni dans le questionnaire.</p></div>'
+        : '<div class="callout"><p>Les propositions ci-dessous synthétisent les annonces de campagne, les prises de position publiques et, le cas échéant, le programme précédent du candidat ou de sa formation. Le programme officiel 2027 peut évoluer.</p></div>') +
       '<div class="layout-sidebar">' +
       '<nav class="summary" aria-labelledby="sommaire-titre"><h2 class="summary__title" id="sommaire-titre">Sommaire</h2><ol>' +
       themesPresents.map(function (t) { return '<li><a href="#theme-' + t.id + '">' + esc(t.label) + "</a></li>"; }).join("") +
@@ -356,7 +368,8 @@
       (manquants.length
         ? '<div class="callout callout--warning" style="margin-top:2rem"><p><strong>Thèmes sans proposition détaillée recensée à ce stade :</strong> ' + manquants.map(function (t) { return esc(t.label); }).join(", ") + ".</p></div>"
         : "") +
-      '<div class="btn-group"><a class="btn" href="comparateur.html">Comparer avec les autres candidats</a><a class="btn btn--secondary" href="questionnaire.html">Faire le questionnaire</a></div>' +
+      (c.fictif ? '<div class="btn-group"><a class="btn" href="candidats.html">Retour aux vrais candidats</a></div>' :
+      '<div class="btn-group"><a class="btn" href="comparateur.html">Comparer avec les autres candidats</a><a class="btn btn--secondary" href="questionnaire.html">Faire le questionnaire</a></div>') +
       "</div></div>";
   }
 
@@ -436,6 +449,10 @@
         '<div class="callout"><h2 class="callout__title">Comment ça marche ?</h2>' +
         "<p>" + total + " affirmations vous sont proposées, une par écran. Pour chacune, indiquez si vous êtes d'accord ou non. Vous pouvez signaler les sujets qui comptent particulièrement pour vous : ils pèseront double dans le calcul.</p>" +
         "<p>À la fin, le site calcule votre degré de proximité avec chacun des " + G.candidats.length + " principaux candidats. Vos réponses restent dans votre navigateur : rien n'est envoyé ni enregistré sur un serveur.</p></div>" +
+        '<h2 class="h3" style="font-size:1.25rem">Les ' + G.candidats.length + " candidats comparés</h2>" +
+        '<ul class="faces">' + G.candidats.map(function (c) {
+          return '<li class="face">' + avatar(c, "md") + '<span class="face__name">' + esc(c.nom) + "</span></li>";
+        }).join("") + "</ul>" +
         '<div class="callout callout--warning"><p><strong>Ce questionnaire est un outil de réflexion, pas une consigne de vote.</strong> Il simplifie des programmes complexes et ne remplace pas leur lecture. Les positions retenues pour chaque candidat sont expliquées dans la page <a href="sources.html">Sources et méthodologie</a>.</p></div>' +
         '<div class="btn-group">' +
         (reprise
@@ -545,7 +562,7 @@
           var p = parti(r.c.parti);
           var s = r.score === null ? "—" : r.score + " %";
           return '<li class="result" style="--result-color:' + p.couleur + '">' +
-            '<div class="result__head"><h3 class="result__name person"><span class="result__rank">' + (k + 1) + ".</span>" + avatar(r.c, "sm") + esc(r.c.nom) + ' <span class="mention" style="font-weight:400">(' + esc(p.sigle) + ")</span></h3>" +
+            '<div class="result__head"><h3 class="result__name person"><span class="result__rank">' + (k + 1) + ".</span>" + avatar(r.c, "md") + esc(r.c.nom) + ' <span class="mention" style="font-weight:400">(' + esc(p.sigle) + ")</span></h3>" +
             '<p class="result__score" style="margin:0"><span class="sr-only">Proximité : </span>' + s + "</p></div>" +
             '<div class="bar" aria-hidden="true"><div class="bar__fill" style="width:' + (r.score || 0) + '%"></div></div>' +
             '<p class="mention" style="margin-bottom:.5rem">Calculé sur ' + r.n + " question" + (r.n > 1 ? "s" : "") + " où sa position est connue.</p>" +

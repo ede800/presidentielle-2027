@@ -595,6 +595,18 @@ img.avatar {
 .portrait__credit { font-size: .6875rem; line-height: 1.35; color: var(--text-mention); margin-top: .375rem; }
 .portrait__credit a { color: var(--text-mention); }
 .person { display: inline-flex; align-items: center; gap: .75rem; }
+.result__name.person { flex-wrap: nowrap; }
+
+.faces {
+  list-style: none; margin: 0 0 1.5rem; padding: 0;
+  display: grid; gap: 1rem .5rem;
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+}
+.face { margin: 0; display: flex; flex-direction: column; align-items: center; text-align: center; gap: .375rem; }
+.face__name { font-size: .8125rem; line-height: 1.3; }
+
+.badge--fiction { background: var(--warning-bg); color: var(--warning); vertical-align: middle; }
+.card--fiction { border-bottom-color: var(--warning); border-style: dashed solid solid; }
 .person .avatar--sm { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
 
 /* ---------- Spectre ---------- */

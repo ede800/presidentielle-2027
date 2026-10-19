@@ -737,6 +737,36 @@ window.GUIDE = {
     }
   ],
 
+  // Bonus : candidats de fiction, exclus du comparateur et du questionnaire
+  fictifs: [
+    {
+      id: "pariston", nom: "Pariston Hill", fictif: true,
+      partiLabel: "Association des Hunters (Douze du Zodiaque, signe du Rat)",
+      familleLabel: "Fiction — Hunter × Hunter",
+      statut: "Candidat fictif, issu du manga Hunter × Hunter de Yoshihiro Togashi",
+      bio: "Vice-président de l'Association des Hunters, toujours souriant, d'une politesse irréprochable et redoutablement manipulateur. Il se présente à l'élection du président de l'Association après la disparition d'Isaac Netero, en multipliant les promesses séduisantes tout en semblant prendre plaisir à être détesté.",
+      slogan: "« J'adore les gens qui me détestent »",
+      programme: {
+        institutions: [
+          "Élection du président par l'ensemble des Hunters, avec autant de tours que nécessaire jusqu'à une majorité.",
+          "Respect total des règles du scrutin… et exploitation méthodique de chacune d'entre elles.",
+          "Un sourire garanti lors de chaque déclaration publique."
+        ],
+        economie: [
+          "Ouverture de l'Association aux Hunters « populaires » plutôt qu'aux seuls Hunters d'élite.",
+          "Gestion du budget de l'Association confiée à des fidèles, dans la plus grande discrétion."
+        ],
+        securite: [
+          "Rapprocher l'Association du grand public et des institutions internationales.",
+          "Ne jamais révéler ses véritables intentions."
+        ],
+        europe: [
+          "Relations étroites avec la famille royale de Kakin et le V5 (puissances du monde de Hunter × Hunter)."
+        ]
+      }
+    }
+  ],
+
   // Candidatures déclarées non détaillées ci-dessus
   autres: [
     { nom: "Bernard Cazeneuve", parti: "La Convention", resume: "Ancien Premier ministre (2016-2017). Gauche républicaine de gouvernement : rigueur budgétaire, ordre républicain, laïcité, engagement européen. Candidat hors primaire (16 juillet 2026)." },
