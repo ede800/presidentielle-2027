@@ -329,6 +329,36 @@
     }).join("");
   }
 
+  // Motifs trop génériques pour être liés dans les textes de programme
+  var MOTIFS_GENERIQUES = ["retraite", "âge légal", "immigration", "européenne", "réacteurs", "collectivités",
+    "mineurs", "1968", "3 %", "remboursés", "expulsion", "éloignement", "fin de vie", "constitution"];
+
+  // Transforme la première occurrence de chaque terme du lexique en lien vers sa définition.
+  // "deja" mémorise les termes déjà liés sur la page pour ne pas surcharger le texte.
+  function lierTermes(texte, deja) {
+    var html = esc(texte);
+    (G.lexique || []).forEach(function (e) {
+      if (deja[e.id]) return;
+      e.motifs.forEach(function (m) {
+        if (deja[e.id] || MOTIFS_GENERIQUES.indexOf(m) !== -1) return;
+        var re = new RegExp("(^|[^a-z0-9à-ÿœ])(" + echapperRegex(esc(m)) + ")(?=$|[^a-z0-9à-ÿœ])", "i");
+        // Ne remplacer que dans le texte, hors balises et hors liens existants
+        var morceaux = html.split(/(<a [^>]*>.*?<\/a>|<[^>]+>)/);
+        for (var i = 0; i < morceaux.length; i += 2) {
+          if (re.test(morceaux[i])) {
+            morceaux[i] = morceaux[i].replace(re, function (_, avant, mot) {
+              return avant + '<a class="term" href="lexique.html#terme-' + e.id + '">' + mot + '<span class="sr-only"> (définition)</span></a>';
+            });
+            deja[e.id] = true;
+            break;
+          }
+        }
+        html = morceaux.join("");
+      });
+    });
+    return html;
+  }
+
   function pageCandidat() {
     var id = new URLSearchParams(window.location.search).get("id");
     var c = byId(G.candidats, id) || byId(G.fictifs || [], id);
@@ -342,6 +372,7 @@
     document.title = c.nom + (c.fictif ? " (fiction)" : "") + " : programme — Présidentielle 2027";
     $("#ariane-courant").textContent = c.nom;
 
+    var liés = {};
     var themesPresents = G.themes.filter(function (t) { return c.programme[t.id]; });
     var manquants = G.themes.filter(function (t) { return !c.programme[t.id]; });
 
@@ -363,7 +394,7 @@
       themesPresents.map(function (t) {
         return '<section class="theme-block" id="theme-' + t.id + '" aria-labelledby="titre-' + t.id + '">' +
           '<h2 id="titre-' + t.id + '"><span class="theme-icon" aria-hidden="true">' + t.icon + "</span>" + esc(t.label) + "</h2>" +
-          "<ul>" + c.programme[t.id].map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" +
+          "<ul>" + c.programme[t.id].map(function (x) { return "<li>" + lierTermes(x, liés) + "</li>"; }).join("") + "</ul>" +
           '<a class="back-top" href="#contenu">Haut de page</a>' +
           "</section>";
       }).join("") +
@@ -393,6 +424,7 @@
 
     function render() {
       var t = theme(selTheme.value);
+      var liés = {};
       var ids = $all("input:checked", checks).map(function (i) { return i.value; });
       var cands = G.candidats.filter(function (c) { return ids.indexOf(c.id) !== -1; });
       status.textContent = "Thème « " + t.label + " » : " + cands.length + " candidat" + (cands.length > 1 ? "s" : "") + " comparé" + (cands.length > 1 ? "s" : "") + ".";
@@ -410,7 +442,7 @@
             '<div><h3 class="card__title" id="cmp-nom-' + c.id + '" style="margin:0;font-size:1.125rem">' + esc(c.nom) + "</h3>" +
             '<p class="mention" style="margin:0">' + esc(p.sigle) + " · " + esc(famille(p.famille).label) + "</p></div></div>" +
             (items
-              ? "<ul>" + items.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>"
+              ? "<ul>" + items.map(function (x) { return "<li>" + lierTermes(x, liés) + "</li>"; }).join("") + "</ul>"
               : '<p class="mention">Pas de proposition détaillée recensée à ce stade.</p>') +
             '<p style="margin-top:auto"><a href="candidat.html?id=' + c.id + "#theme-" + t.id + '">Programme complet<span class="sr-only"> de ' + esc(c.nom) + "</span></a></p>" +
             "</article></li>";
@@ -638,7 +670,9 @@
         '<h3 class="verdict__name" id="verdict-titre">' + esc(premier.c.nom) + "</h3>" +
         '<p class="verdict__party">' + esc(parti(premier.c.parti).nom) + "</p>" +
         '<p class="verdict__score">' + premier.score + ' %<span class="sr-only"> de proximité</span></p></div></div>' +
-        "<p>" + (ecart <= 3
+        "<p>" + (ecart === 0
+          ? "<strong>Égalité parfaite</strong> avec " + esc(second.c.nom) + " (" + second.score + " %). Vos idées se situent entre ces deux candidats : comparez leurs programmes sur les thèmes qui comptent le plus pour vous."
+          : ecart <= 3
           ? "<strong>Résultat très serré :</strong> " + esc(second.c.nom) + " n'est qu'à " + ecart + " point" + (ecart > 1 ? "s" : "") + " (" + second.score + " %). Vos idées se situent entre ces deux candidats : comparez leurs programmes sur les thèmes qui comptent le plus pour vous."
           : ecart <= 8
             ? "Suivi de " + esc(second.c.nom) + " (" + second.score + " %, à " + ecart + " points). L'écart est net mais modéré."
@@ -705,8 +739,11 @@
         '<div class="btn-group no-print">' +
         '<button type="button" class="btn" id="quiz-modifier">Modifier mes réponses</button>' +
         '<button type="button" class="btn btn--secondary" id="quiz-restart">Recommencer à zéro</button>' +
+        '<button type="button" class="btn btn--tertiary" id="quiz-partager">Copier le lien de mes résultats</button>' +
         '<button type="button" class="btn btn--tertiary" id="quiz-print">Imprimer mes résultats</button>' +
-        "</div>";
+        "</div>" +
+        '<div id="quiz-lien" class="form-group no-print" hidden><label class="label" for="quiz-lien-input">Lien de vos résultats <span class="hint">Vos réponses sont contenues dans ce lien : ne le partagez qu’avec des personnes de confiance.</span></label><input class="input" id="quiz-lien-input" type="text" readonly></div>' +
+        '<p class="sr-only" role="status" aria-live="polite" id="quiz-annonce"></p>';
 
       var complet = $("#quiz-complet");
       if (complet) complet.addEventListener("click", function () {
@@ -720,11 +757,54 @@
       $("#quiz-modifier").addEventListener("click", function () { state.i = 0; save(); etape(); });
       $("#quiz-restart").addEventListener("click", function () { state = vide(state.mode); save(); intro(); focusTitre(); window.scrollTo(0, 0); });
       $("#quiz-print").addEventListener("click", function () { window.print(); });
+      $("#quiz-partager").addEventListener("click", function () {
+        var url = window.location.href.split("#")[0] + "#r=" + encoder();
+        var bloc = $("#quiz-lien"), input = $("#quiz-lien-input"), annonce = $("#quiz-annonce");
+        input.value = url;
+        bloc.hidden = false;
+        annonce.textContent = "Le lien de vos résultats est affiché sous les boutons.";
+        var ok = function () { annonce.textContent = "Lien copié dans le presse-papiers. Il est aussi affiché sous les boutons."; };
+        var ko = function () { input.focus(); input.select(); annonce.textContent = "Copiez le lien affiché dans le champ."; };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(ok, ko); else ko();
+      });
       haut();
       focusTitre();
     }
 
-    intro();
+    // Codage compact : 1 caractère pour le mode, puis 2 caractères par question (réponse, importance)
+    var CODE_REP = { "2": "A", "1": "B", "0": "C", "-1": "D", "-2": "E", "null": "N" };
+    var CODE_IMP = { "0.5": "s", "1": "n", "2": "p" };
+    function inverser(o) { var r = {}; Object.keys(o).forEach(function (k) { r[o[k]] = k; }); return r; }
+    function encoder() {
+      return (state.mode === "complet" ? "k" : "c") + Q.questions.map(function (q) {
+        var r = state.rep[q.id];
+        return (r === undefined ? "_" : CODE_REP[String(r)]) + (CODE_IMP[String(state.imp[q.id] == null ? 1 : state.imp[q.id])] || "n");
+      }).join("");
+    }
+    function decoder(code) {
+      var dr = inverser(CODE_REP), di = inverser(CODE_IMP);
+      if (!/^[ck]([A-EN_][snp])+$/.test(code) || (code.length - 1) / 2 !== Q.questions.length) return null;
+      var st = vide(code[0] === "k" ? "complet" : "court");
+      Q.questions.forEach(function (q, k) {
+        var a = code[1 + 2 * k], b = code[2 + 2 * k];
+        if (a !== "_") st.rep[q.id] = a === "N" ? null : Number(dr[a]);
+        st.imp[q.id] = Number(di[b]);
+      });
+      return st;
+    }
+
+    var partage = /^#r=(.+)$/.exec(window.location.hash);
+    var etatPartage = partage ? decoder(partage[1]) : null;
+    if (etatPartage) {
+      state = etatPartage;
+      state.i = Q.questions.filter(function (q) { return state.mode === "complet" || q.court; }).length;
+      // Pas de save() : on n'écrase pas les réponses enregistrées de la personne qui ouvre le lien
+      resultats();
+      root.insertAdjacentHTML("afterbegin", '<div class="callout no-print"><p>Ces résultats ont été ouverts depuis un lien partagé. <a href="questionnaire.html">Faire le questionnaire vous-même</a>.</p></div>');
+      if (window.history && window.history.replaceState) window.history.replaceState(null, "", window.location.pathname);
+    } else {
+      intro();
+    }
   }
 
   /* ---------- Lexique ---------- */
