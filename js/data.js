@@ -603,6 +603,52 @@ window.GUIDE = {
       }
     },
     {
+      id: "lisnard", nom: "David Lisnard", parti: "nouvelle-energie", statut: "Candidat déclaré (31 mars 2026)",
+      bio: "Maire de Cannes depuis 2014, ancien président de l'Association des maires de France, fondateur de Nouvelle Énergie. Il a quitté Les Républicains en 2026 et réclame une primaire ouverte de la droite et du centre.",
+      slogan: null,
+      programme: {
+        economie: [
+          "Choc de réduction de la dépense publique : environ 80 Md€ d'économies dès la première année, jusqu'à 200 Md€ par an en fin de quinquennat.",
+          "Ramener la dépense publique vers 50 % du PIB en dix ans, « règle d'or » sur les dépenses de fonctionnement.",
+          "Baisse des impôts et des charges sur le travail et la production, simplification massive des normes."
+        ],
+        travail: [
+          "Report de l'âge de départ à 65 ans.",
+          "Socle de retraite par répartition complété par un étage de capitalisation obligatoire et collectif.",
+          "Baisse des charges plutôt que hausse du SMIC pour augmenter le salaire net ; liberté de négocier le temps de travail dans l'entreprise."
+        ],
+        social: [
+          "RSA conditionné à une activité et plafonnement du cumul des aides sociales.",
+          "Lutte contre la fraude sociale."
+        ],
+        education: [
+          "Autonomie des établissements scolaires et des chefs d'établissement.",
+          "Recentrage sur les savoirs fondamentaux et l'autorité."
+        ],
+        ecologie: [
+          "Écologie « non punitive » fondée sur l'innovation et le nucléaire.",
+          "Opposition aux normes jugées excessives (zones à faibles émissions, artificialisation)."
+        ],
+        immigration: [
+          "Forte réduction de l'immigration légale, quotas d'immigration de travail par secteur.",
+          "Fin du droit du sol automatique.",
+          "Aucune régularisation après une entrée illégale."
+        ],
+        securite: [
+          "Renforcement des polices municipales et des pouvoirs des maires en matière de sécurité.",
+          "Exécution effective et rapide des peines."
+        ],
+        europe: [
+          "Europe recentrée sur ses compétences essentielles, respect de la subsidiarité.",
+          "Soutien à l'Ukraine et maintien dans l'OTAN."
+        ],
+        institutions: [
+          "Élargissement de l'article 11 pour que tout sujet puisse être soumis à référendum.",
+          "Décentralisation massive : transfert de compétences et de moyens aux collectivités, à commencer par les communes."
+        ]
+      }
+    },
+    {
       id: "zemmour", nom: "Éric Zemmour", parti: "reconquete", statut: "Candidat déclaré (17 septembre 2026)",
       bio: "Journaliste et essayiste, fondateur de Reconquête. Candidat en 2022 (7,07 %), il se positionne à droite du RN, notamment sur l'immigration et l'identité.",
       slogan: null,
@@ -696,7 +742,6 @@ window.GUIDE = {
     { nom: "Bernard Cazeneuve", parti: "La Convention", resume: "Ancien Premier ministre (2016-2017). Gauche républicaine de gouvernement : rigueur budgétaire, ordre républicain, laïcité, engagement européen. Candidat hors primaire (16 juillet 2026)." },
     { nom: "Delphine Batho", parti: "Génération écologie", resume: "Ancienne ministre de l'Écologie. Écologie de la sobriété, opposée à une primaire unitaire de la gauche (25 novembre 2025)." },
     { nom: "Karim Bouamrane", parti: "PS", resume: "Maire de Saint-Ouen, figure d'une gauche sociale-démocrate tournée vers les quartiers populaires et l'entreprise (9 juin 2026)." },
-    { nom: "David Lisnard", parti: "Nouvelle Énergie", resume: "Maire de Cannes. Libéralisme, baisse massive de la dépense publique, décentralisation ; réclame une primaire de la droite (31 mars 2026)." },
     { nom: "Xavier Bertrand", parti: "Nous France / LR", resume: "Président de la région Hauts-de-France. Droite sociale : travail, salaires, sécurité, ruralité (annonce en février 2024)." },
     { nom: "Olivier Becht", parti: "Renaissance / Agir", resume: "Ancien ministre du Commerce extérieur. Ligne centriste et proeuropéenne (24 septembre 2026)." },
     { nom: "Gilles Platret", parti: "Divers droite", resume: "Maire de Chalon-sur-Saône. Droite conservatrice, laïcité stricte et fermeté migratoire (8 octobre 2026)." },
@@ -733,6 +778,7 @@ window.GUIDE = {
     { titre: "Présidentielle 2027 : les principaux candidats déclarés — Touteleurope.eu", url: "https://www.touteleurope.eu/vie-politique-des-etats-membres/presidentielle-2027-qui-sont-les-candidats-deja-declares/" },
     { titre: "Marine Le Pen condamnée en appel mais éligible — Touteleurope.eu", url: "https://www.touteleurope.eu/vie-politique-des-etats-membres/proces-des-assistants-du-rn-marine-le-pen-condamnee-en-appel-mais-eligible-a-l-election-presidentielle-2027/" },
     { titre: "Comparatif des programmes — ÉlyséeScope 2027", url: "https://www.elyseescope.com/questions/comparatif-des-programmes-des-candidats-a-la-presidentielle-2027" },
+    { titre: "Programme de David Lisnard pour 2027 — France-Vote", url: "https://www.france-vote.fr/actualites/programme-david-lisnard-2027" },
     { titre: "Conseil constitutionnel — élection présidentielle", url: "https://www.conseil-constitutionnel.fr/" }
   ]
 };

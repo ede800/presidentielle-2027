@@ -3,6 +3,17 @@
   "use strict";
 
   var G = window.GUIDE;
+
+  // Candidats présentés de la gauche vers la droite (ordre des familles), sans autre hiérarchie
+  (function () {
+    var rang = {};
+    G.familles.forEach(function (f, i) { rang[f.id] = i; });
+    var rangCandidat = function (c) { return rang[byId(G.partis, c.parti).famille]; };
+    G.candidats = G.candidats
+      .map(function (c, i) { return { c: c, i: i }; })
+      .sort(function (a, b) { return (rangCandidat(a.c) - rangCandidat(b.c)) || (a.i - b.i); })
+      .map(function (x) { return x.c; });
+  })();
   var NAV = [
     { href: "index.html", label: "Accueil", page: "accueil" },
     { href: "election.html", label: "L'élection", page: "election" },
@@ -38,10 +49,30 @@
     return (1.05 / (L + 0.05)) >= 4.5 ? "#ffffff" : "#161616";
   }
 
-  function avatar(c, small) {
+  // Clé du portrait : identifiant du candidat, ou nom de famille pour les autres candidatures
+  function clePortrait(c) {
+    if (c.id) return c.id;
+    return c.nom.split(" ").slice(1).join("-").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  }
+  function portrait(c) { return (G.portraits || {})[clePortrait(c)] || null; }
+
+  // Le nom figure toujours à côté de l'image : elle est donc décorative (alt vide)
+  function avatar(c, taille) {
+    var cls = "avatar" + (taille ? " avatar--" + taille : "");
+    var ph = portrait(c);
+    if (ph) return '<img class="' + cls + '" src="' + esc(ph.src) + '" alt="" loading="lazy" decoding="async">';
     var p = parti(c.parti);
-    var bg = p ? p.couleur : "#000091";
-    return '<span class="avatar' + (small ? " avatar--sm" : "") + '" aria-hidden="true" style="--avatar-color:' + bg + ';color:' + texteSur(bg) + '">' + esc(initiales(c.nom)) + "</span>";
+    var bg = p ? p.couleur : "#6a6a6a";
+    return '<span class="' + cls + '" aria-hidden="true" style="--avatar-color:' + bg + ';color:' + texteSur(bg) + '">' + esc(initiales(c.nom)) + "</span>";
+  }
+
+  function credit(c) {
+    var ph = portrait(c);
+    if (!ph) return "";
+    var lic = ph.licenceUrl
+      ? '<a href="' + esc(ph.licenceUrl) + '" rel="noopener license" target="_blank">' + esc(ph.licence) + '<span class="sr-only"> (nouvelle fenêtre)</span></a>'
+      : esc(ph.licence);
+    return 'Photo : <a href="' + esc(ph.page) + '" rel="noopener" target="_blank">' + esc(ph.auteur) + '<span class="sr-only"> (Wikimedia Commons, nouvelle fenêtre)</span></a>, ' + lic;
   }
 
   var store = {
@@ -272,7 +303,7 @@
     list.innerHTML = G.candidats.map(function (c) {
       var p = parti(c.parti);
       return '<li><div class="card">' +
-        '<div class="profile" style="margin-bottom:1rem">' + avatar(c, true) +
+        '<div class="profile" style="margin-bottom:1rem">' + avatar(c, "md") +
         '<div><h3 class="card__title" style="margin:0"><a href="candidat.html?id=' + c.id + '">' + esc(c.nom) + "</a></h3>" +
         '<p class="mention" style="margin:0">' + esc(p.nom) + " · " + esc(famille(p.famille).label) + "</p></div></div>" +
         '<p class="card__desc">' + esc(c.statut) + "</p>" +
@@ -282,7 +313,7 @@
     }).join("");
 
     $("#autres-candidats").innerHTML = G.autres.map(function (a) {
-      return '<tr><th scope="row">' + esc(a.nom) + "</th><td>" + esc(a.parti) + "</td><td>" + esc(a.resume) + "</td></tr>";
+      return '<tr><th scope="row"><span class="person">' + avatar(a, "sm") + esc(a.nom) + "</span></th><td>" + esc(a.parti) + "</td><td>" + esc(a.resume) + "</td></tr>";
     }).join("");
   }
 
@@ -303,7 +334,8 @@
     var manquants = G.themes.filter(function (t) { return !c.programme[t.id]; });
 
     root.innerHTML =
-      '<div class="profile" style="margin-bottom:1.5rem">' + avatar(c) +
+      '<div class="profile" style="margin-bottom:1.5rem">' +
+      (portrait(c) ? '<figure class="portrait">' + avatar(c, "lg") + '<figcaption class="portrait__credit">' + credit(c) + "</figcaption></figure>" : avatar(c, "lg")) +
       "<div><h1 style=\"margin-bottom:.5rem\">" + esc(c.nom) + "</h1>" +
       '<p class="lead" style="margin:0">' + esc(p.nom) + " (" + esc(p.sigle) + ") · " + esc(famille(p.famille).label) + "</p>" +
       '<p class="mention" style="margin:0">' + esc(c.statut) + (c.slogan ? " · Slogan : " + esc(c.slogan) : "") + "</p></div></div>" +
@@ -359,7 +391,7 @@
           var p = parti(c.parti);
           var items = c.programme[t.id];
           return '<li><article class="card card--static" aria-labelledby="cmp-nom-' + c.id + '">' +
-            '<div class="profile" style="margin-bottom:1rem;gap:1rem">' + avatar(c, true) +
+            '<div class="profile" style="margin-bottom:1rem;gap:1rem">' + avatar(c, "sm") +
             '<div><h3 class="card__title" id="cmp-nom-' + c.id + '" style="margin:0;font-size:1.125rem">' + esc(c.nom) + "</h3>" +
             '<p class="mention" style="margin:0">' + esc(p.sigle) + " · " + esc(famille(p.famille).label) + "</p></div></div>" +
             (items
@@ -513,7 +545,7 @@
           var p = parti(r.c.parti);
           var s = r.score === null ? "—" : r.score + " %";
           return '<li class="result" style="--result-color:' + p.couleur + '">' +
-            '<div class="result__head"><h3 class="result__name"><span class="result__rank">' + (k + 1) + ".</span>" + esc(r.c.nom) + ' <span class="mention" style="font-weight:400">(' + esc(p.sigle) + ")</span></h3>" +
+            '<div class="result__head"><h3 class="result__name person"><span class="result__rank">' + (k + 1) + ".</span>" + avatar(r.c, "sm") + esc(r.c.nom) + ' <span class="mention" style="font-weight:400">(' + esc(p.sigle) + ")</span></h3>" +
             '<p class="result__score" style="margin:0"><span class="sr-only">Proximité : </span>' + s + "</p></div>" +
             '<div class="bar" aria-hidden="true"><div class="bar__fill" style="width:' + (r.score || 0) + '%"></div></div>' +
             '<p class="mention" style="margin-bottom:.5rem">Calculé sur ' + r.n + " question" + (r.n > 1 ? "s" : "") + " où sa position est connue.</p>" +
@@ -554,6 +586,11 @@
   /* ---------- Sources ---------- */
 
   function pageSources() {
+    var cr = $("#credits-photos");
+    if (cr) {
+      var tous = G.candidats.concat(G.autres).filter(portrait);
+      cr.innerHTML = tous.map(function (c) { return "<li><strong>" + esc(c.nom) + "</strong> — " + credit(c) + "</li>"; }).join("");
+    }
     var el = $("#liste-sources");
     if (el) el.innerHTML = G.sources.map(function (s) {
       return '<li><a href="' + esc(s.url) + '" rel="noopener" target="_blank">' + esc(s.titre) + '<span class="sr-only"> (nouvelle fenêtre)</span></a></li>';

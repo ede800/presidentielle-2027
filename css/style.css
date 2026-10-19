@@ -582,6 +582,20 @@ tbody tr:nth-child(even) { background: var(--bg-alt); }
   border: 1px solid var(--border);
 }
 .avatar--sm { width: 3rem; height: 3rem; font-size: 1.125rem; }
+.avatar--md { width: 4.5rem; height: 4.5rem; font-size: 1.5rem; }
+.avatar--lg { width: 8rem; height: 10rem; font-size: 2.5rem; }
+img.avatar {
+  object-fit: cover;
+  object-position: 50% 20%;
+  background: var(--bg-contrast);
+  padding: 0;
+}
+.avatar--sm, .avatar--md { border-radius: 50%; }
+.portrait { margin: 0; flex: none; width: 8rem; }
+.portrait__credit { font-size: .6875rem; line-height: 1.35; color: var(--text-mention); margin-top: .375rem; }
+.portrait__credit a { color: var(--text-mention); }
+.person { display: inline-flex; align-items: center; gap: .75rem; }
+.person .avatar--sm { width: 2.5rem; height: 2.5rem; font-size: 1rem; }
 
 /* ---------- Spectre ---------- */
 
