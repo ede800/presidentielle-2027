@@ -84,6 +84,7 @@
       '<span><span class="brand__title">Présidentielle 2027</span><span class="brand__tagline">Guide citoyen des partis et des programmes</span></span>' +
       "</a>" +
       '<div class="header__tools">' +
+      '<button type="button" class="btn btn--tertiary btn--sm" id="btn-theme"></button>' +
       '<button type="button" class="btn btn--tertiary btn--sm menu-toggle" aria-expanded="false" aria-controls="navigation">Menu</button>' +
       "</div></div></div>" +
       '<nav class="nav" id="navigation" aria-label="Menu principal" tabindex="-1" hidden><div class="container"><ul class="nav__list">' + nav + "</ul></div></nav>" +
@@ -136,6 +137,30 @@
       }
     });
 
+    // Bascule rapide clair / sombre dans l'en-tête
+    var btnTheme = $("#btn-theme");
+    function themeEffectif() {
+      var t = document.documentElement.getAttribute("data-theme");
+      if (t) return t;
+      return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    function majBoutonTheme() {
+      var sombre = themeEffectif() === "dark";
+      btnTheme.innerHTML = '<span aria-hidden="true">' + (sombre ? "☀" : "☾") + '</span> <span class="btn-theme__label">' + (sombre ? "Passer en thème clair" : "Passer en thème sombre") + "</span>";
+    }
+    btnTheme.addEventListener("click", function () {
+      var t = themeEffectif() === "dark" ? "light" : "dark";
+      store.set("theme", t);
+      appliquerTheme(t);
+      $("#theme-" + t).checked = true;
+      majBoutonTheme();
+    });
+    if (window.matchMedia) {
+      var mq = window.matchMedia("(prefers-color-scheme: dark)");
+      if (mq.addEventListener) mq.addEventListener("change", majBoutonTheme);
+    }
+    majBoutonTheme();
+
     // Paramètres d'affichage
     var modal = $("#modal-affichage");
     var current = store.get("theme") || "system";
@@ -150,6 +175,7 @@
       r.addEventListener("change", function () {
         if (r.value === "system") store.del("theme"); else store.set("theme", r.value);
         appliquerTheme(r.value);
+        majBoutonTheme();
       });
     });
   }
