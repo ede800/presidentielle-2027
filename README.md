@@ -14,7 +14,8 @@ Site statique, indépendant et neutre, qui présente les partis politiques fran�
 | `candidats.html` | Principaux candidats et autres candidatures déclarées |
 | `candidat.html?id=…` | Programme détaillé d'un candidat sur 9 thèmes |
 | `comparateur.html` | Comparaison côte à côte des candidats sur un thème |
-| `questionnaire.html` | 24 affirmations pour calculer sa proximité avec chaque candidat |
+| `questionnaire.html` | 25 ou 52 affirmations expliquées (contexte, arguments, définitions) pour calculer sa proximité avec chaque candidat, globalement et par thème |
+| `lexique.html` | Définitions simples des notions politiques, économiques et juridiques |
 | `sources.html` | Sources, méthodologie et calcul du questionnaire |
 | `accessibilite.html` | Déclaration d'accessibilité (RGAA 4.1) |
 | `plan.html` | Plan du site |
@@ -50,10 +51,12 @@ python -m http.server 8000
 
 ## Mettre à jour les données
 
-Tout le contenu est dans deux fichiers :
+Tout le contenu est dans ces fichiers :
 
 - `js/data.js` : partis, candidats, programmes par thème, autres candidatures, sources ;
-- `js/questionnaire-data.js` : questions et position de chaque candidat (de −2 à +2, `null` si inconnue).
+- `js/questionnaire-data.js` : questions, contexte, arguments pour et contre, et position de chaque candidat (de −2 à +2, `null` si inconnue) ;
+- `js/lexique.js` : définitions du lexique, affichées automatiquement dans le questionnaire quand un terme apparaît dans une question ;
+- `js/portraits.js` : portraits sous licence libre et crédits.
 
 Pensez à mettre à jour le champ `maj` (date de mise à jour) dans `js/data.js`.
 
@@ -64,3 +67,11 @@ Les corrections sont bienvenues **à condition d'être sourcées** (programme of
 ## Licence
 
 Code sous licence MIT. Les données sont une synthèse d'informations publiques : vérifiez toujours auprès des sources officielles des candidats.
+
+## Photo du candidat fictif
+
+Les images de *Hunter × Hunter* sont protégées par le droit d'auteur : aucune n'est fournie. Pour afficher une image de Pariston dont vous détenez les droits (ou une illustration libre), placez-la dans `img/portraits/pariston.jpg` puis ajoutez dans `js/data.js`, sur l'entrée `pariston` :
+
+```js
+photo: { src: "img/portraits/pariston.jpg", auteur: "Nom de l'auteur", licence: "Licence", licenceUrl: "", page: "lien vers la source" },
+```

@@ -20,7 +20,8 @@
     { href: "partis.html", label: "Partis politiques", page: "partis" },
     { href: "candidats.html", label: "Candidats et programmes", page: "candidats" },
     { href: "comparateur.html", label: "Comparateur", page: "comparateur" },
-    { href: "questionnaire.html", label: "Questionnaire", page: "questionnaire" }
+    { href: "questionnaire.html", label: "Questionnaire", page: "questionnaire" },
+    { href: "lexique.html", label: "Lexique", page: "lexique" }
   ];
 
   /* ---------- Utilitaires ---------- */
@@ -54,7 +55,7 @@
     if (c.id) return c.id;
     return c.nom.split(" ").slice(1).join("-").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   }
-  function portrait(c) { return (G.portraits || {})[clePortrait(c)] || null; }
+  function portrait(c) { return c.photo || (G.portraits || {})[clePortrait(c)] || null; }
 
   // Le nom figure toujours à côté de l'image : elle est donc décorative (alt vide)
   function avatar(c, taille) {
@@ -220,7 +221,8 @@
       { v: G.partis.length, l: "partis et mouvements présentés" },
       { v: G.candidats.length + G.autres.length, l: "candidatures déclarées recensées" },
       { v: G.themes.length, l: "thèmes de programme comparés" },
-      { v: G.questionnaire.questions.length, l: "questions pour situer vos idées" }
+      { v: G.questionnaire.questions.length, l: "questions pour situer vos idées" },
+      { v: (G.lexique || []).length, l: "notions expliquées dans le lexique" }
     ];
     el.innerHTML = stats.map(function (s) {
       return '<li class="stat"><span class="stat__value">' + s.v + '</span><span class="stat__label">' + esc(s.l) + "</span></li>";
@@ -424,59 +426,96 @@
 
   /* ---------- Questionnaire ---------- */
 
+  function echapperRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+  // Termes du lexique présents dans un texte (recherche par mot entier)
+  function termesDans(texte) {
+    var t = " " + texte.toLowerCase() + " ";
+    return (G.lexique || []).filter(function (e) {
+      return e.motifs.some(function (m) {
+        return new RegExp("(^|[^a-z0-9à-ÿœ])" + echapperRegex(m) + "($|[^a-z0-9à-ÿœ])").test(t);
+      });
+    });
+  }
+
   function pageQuestionnaire() {
     var Q = G.questionnaire;
-    var total = Q.questions.length;
     var root = $("#quiz");
-    var KEY = "quiz-reponses-v1";
-    var state = { i: 0, rep: {}, imp: {} };
+    var KEY = "quiz-reponses-v2";
+    var vide = function (mode) { return { mode: mode || "court", i: 0, rep: {}, imp: {} }; };
+    var state = vide();
 
     try {
       var saved = JSON.parse(store.get(KEY) || "null");
-      if (saved && saved.rep) state = saved;
+      if (saved && saved.rep && saved.mode) state = saved;
     } catch (e) { /* données invalides : on repart de zéro */ }
 
+    function liste() { return Q.questions.filter(function (q) { return state.mode === "complet" || q.court; }); }
     function save() { store.set(KEY, JSON.stringify(state)); }
+    function focusTitre() { var t = $("#quiz-focus", root); if (t) t.focus(); }
+    function haut() { window.scrollTo(0, root.getBoundingClientRect().top + window.pageYOffset - 16); }
+    var nbCourt = Q.questions.filter(function (q) { return q.court; }).length;
+    var nbComplet = Q.questions.length;
 
-    function focusTitre() {
-      var t = $("#quiz-focus", root);
-      if (t) t.focus();
-    }
-
+    /* Écran d'accueil */
     function intro() {
       var reprise = Object.keys(state.rep).length > 0;
       root.innerHTML =
         '<div class="callout"><h2 class="callout__title">Comment ça marche ?</h2>' +
-        "<p>" + total + " affirmations vous sont proposées, une par écran. Pour chacune, indiquez si vous êtes d'accord ou non. Vous pouvez signaler les sujets qui comptent particulièrement pour vous : ils pèseront double dans le calcul.</p>" +
-        "<p>À la fin, le site calcule votre degré de proximité avec chacun des " + G.candidats.length + " principaux candidats. Vos réponses restent dans votre navigateur : rien n'est envoyé ni enregistré sur un serveur.</p></div>" +
+        "<p>Une affirmation vous est proposée par écran. Pour chacune, vous trouverez le contexte, les arguments des partisans et des opposants, et la définition des mots techniques. Indiquez ensuite si vous êtes d'accord, et quelle importance vous accordez au sujet.</p>" +
+        "<p>À la fin, le site calcule votre proximité avec chacun des " + G.candidats.length + " principaux candidats, globalement et thème par thème, et vous montre vos principaux points d'accord et de désaccord. Vos réponses restent dans votre navigateur : rien n'est envoyé ni enregistré sur un serveur.</p></div>" +
         '<h2 class="h3" style="font-size:1.25rem">Les ' + G.candidats.length + " candidats comparés</h2>" +
         '<ul class="faces">' + G.candidats.map(function (c) {
           return '<li class="face">' + avatar(c, "md") + '<span class="face__name">' + esc(c.nom) + "</span></li>";
         }).join("") + "</ul>" +
-        '<div class="callout callout--warning"><p><strong>Ce questionnaire est un outil de réflexion, pas une consigne de vote.</strong> Il simplifie des programmes complexes et ne remplace pas leur lecture. Les positions retenues pour chaque candidat sont expliquées dans la page <a href="sources.html">Sources et méthodologie</a>.</p></div>' +
-        '<div class="btn-group">' +
+        '<div class="callout callout--warning"><p><strong>Ce questionnaire est un outil de réflexion, pas une consigne de vote.</strong> Il simplifie des programmes complexes et ne remplace pas leur lecture. Les positions retenues pour chaque candidat sont expliquées dans la page <a href="sources.html">Sources et méthodologie</a>. Les mots techniques sont définis dans le <a href="lexique.html">lexique</a>.</p></div>' +
         (reprise
-          ? '<button type="button" class="btn btn--lg" id="quiz-reprendre">Reprendre le questionnaire (question ' + Math.min(state.i + 1, total) + ")</button>" +
-            '<button type="button" class="btn btn--secondary btn--lg" id="quiz-start">Recommencer depuis le début</button>'
-          : '<button type="button" class="btn btn--lg" id="quiz-start">Commencer le questionnaire</button>') +
-        "</div>";
-      $("#quiz-start").addEventListener("click", function () { state = { i: 0, rep: {}, imp: {} }; save(); etape(); });
-      if (reprise) $("#quiz-reprendre").addEventListener("click", function () { if (state.i >= total) resultats(); else etape(); });
+          ? '<div class="btn-group"><button type="button" class="btn btn--lg" id="quiz-reprendre">Reprendre le questionnaire (question ' + Math.min(state.i + 1, liste().length) + " sur " + liste().length + ")</button></div>" +
+            '<h2 class="h3" style="font-size:1.25rem;margin-top:2rem">Ou recommencer depuis le début</h2>'
+          : "") +
+        '<form id="quiz-mode" novalidate>' +
+        '<fieldset><legend class="fieldset__legend">Choisissez votre version</legend><div class="answers" style="margin-top:0">' +
+        '<div class="answer"><input type="radio" name="mode" id="mode-court" value="court"' + (state.mode !== "complet" ? " checked" : "") + '><label for="mode-court"><span><strong>Version courte</strong> — ' + nbCourt + ' questions, environ 6 minutes<span class="hint">Les grands sujets qui différencient le plus les candidats.</span></span></label></div>' +
+        '<div class="answer"><input type="radio" name="mode" id="mode-complet" value="complet"' + (state.mode === "complet" ? " checked" : "") + '><label for="mode-complet"><span><strong>Version complète</strong> — ' + nbComplet + ' questions, environ 12 minutes<span class="hint">Résultat plus précis : santé, logement, fin de vie, défense, laïcité, institutions…</span></span></label></div>' +
+        "</div></fieldset>" +
+        '<div class="btn-group"><button type="submit" class="btn btn--lg' + (reprise ? " btn--secondary" : "") + '">' + (reprise ? "Recommencer" : "Commencer le questionnaire") + "</button></div></form>";
+
+      $("#quiz-mode").addEventListener("submit", function (e) {
+        e.preventDefault();
+        state = vide($('input[name="mode"]:checked', root).value);
+        save(); etape();
+      });
+      if (reprise) $("#quiz-reprendre").addEventListener("click", function () { if (state.i >= liste().length) resultats(); else etape(); });
     }
 
+    /* Une question */
     function etape() {
-      var q = Q.questions[state.i];
+      var qs = liste();
+      var total = qs.length;
+      var q = qs[state.i];
       var t = theme(q.theme);
       var rep = state.rep[q.id];
+      var imp = state.imp[q.id] == null ? 1 : state.imp[q.id];
+      var mots = termesDans(q.texte + " " + q.contexte);
+
       root.innerHTML =
         '<div class="stepper">' +
         '<h2 class="stepper__title" id="quiz-focus" tabindex="-1">Question ' + (state.i + 1) + " sur " + total + "</h2>" +
         '<p class="stepper__state">Thème : ' + esc(t.label) + "</p>" +
         '<progress class="progress" max="' + total + '" value="' + (state.i + 1) + '" aria-label="Progression du questionnaire">' + (state.i + 1) + " sur " + total + "</progress></div>" +
         '<form id="quiz-form" novalidate>' +
-        '<fieldset aria-describedby="quiz-contexte' + '">' +
-        '<legend class="h3" style="font-size:1.5rem;font-weight:700;margin-bottom:.75rem">' + esc(q.texte) + "</legend>" +
-        '<p class="mention" id="quiz-contexte">Contexte : ' + esc(q.contexte) + "</p>" +
+        '<fieldset aria-describedby="quiz-contexte">' +
+        '<legend class="quiz-question">' + esc(q.texte) + "</legend>" +
+        '<div class="explain">' +
+        '<p id="quiz-contexte"><strong>Contexte.</strong> ' + esc(q.contexte) + "</p>" +
+        (mots.length
+          ? '<div class="explain__words"><p class="explain__title">Mots à connaître</p><dl class="glossary glossary--compact">' +
+            mots.map(function (m) { return "<dt>" + esc(m.terme) + "</dt><dd>" + esc(m.def) + "</dd>"; }).join("") + "</dl></div>"
+          : "") +
+        '<details class="accordion explain__args"><summary>Voir les arguments pour et contre</summary><div class="accordion__body args">' +
+        '<div class="args__col args__col--pour"><p class="explain__title">Arguments des partisans</p><p>' + esc(q.pour) + "</p></div>" +
+        '<div class="args__col args__col--contre"><p class="explain__title">Arguments des opposants</p><p>' + esc(q.contre) + "</p></div>" +
+        "</div></details></div>" +
         '<div class="answers">' +
         Q.echelle.map(function (o, k) {
           var v = o.valeur === null ? "null" : String(o.valeur);
@@ -485,7 +524,11 @@
         }).join("") +
         "</div></fieldset>" +
         '<p id="quiz-erreur" class="callout callout--warning" role="alert" hidden>Veuillez choisir une réponse (ou « Sans opinion ») pour continuer.</p>' +
-        '<div class="checkbox form-group"><input type="checkbox" id="quiz-important"' + (state.imp[q.id] ? " checked" : "") + '><label for="quiz-important">Ce sujet est particulièrement important pour moi <span class="hint">Il comptera double dans le calcul</span></label></div>' +
+        '<fieldset class="form-group importance"><legend class="fieldset__legend">Quelle importance accordez-vous à ce sujet ? <span class="hint">Un sujet prioritaire compte quatre fois plus qu\'un sujet secondaire dans le calcul.</span></legend><div class="checks">' +
+        Q.importance.map(function (o, k) {
+          return '<div class="check"><input type="radio" name="importance" id="imp-' + k + '" value="' + o.valeur + '"' + (imp === o.valeur ? " checked" : "") + '><label for="imp-' + k + '">' + esc(o.label) + "</label></div>";
+        }).join("") +
+        "</div></fieldset>" +
         '<div class="btn-group">' +
         (state.i > 0 ? '<button type="button" class="btn btn--secondary" id="quiz-prev">Question précédente</button>' : "") +
         '<button type="submit" class="btn">' + (state.i === total - 1 ? "Voir mes résultats" : "Question suivante") + "</button>" +
@@ -493,84 +536,166 @@
         "</div></form>";
 
       var form = $("#quiz-form");
+      function enregistrer() {
+        var r = $('input[name="reponse"]:checked', form);
+        if (r) state.rep[q.id] = r.value === "null" ? null : Number(r.value);
+        state.imp[q.id] = Number($('input[name="importance"]:checked', form).value);
+        return !!r;
+      }
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var r = $('input[name="reponse"]:checked', form);
-        if (!r) {
-          var err = $("#quiz-erreur");
-          err.hidden = false;
+        if (!enregistrer()) {
+          $("#quiz-erreur").hidden = false;
           $("#rep-0").focus();
           return;
         }
-        state.rep[q.id] = r.value === "null" ? null : Number(r.value);
-        state.imp[q.id] = $("#quiz-important").checked;
         state.i++;
         save();
-        if (state.i >= total) resultats(); else { etape(); }
+        if (state.i >= total) resultats(); else etape();
       });
       var prev = $("#quiz-prev");
-      if (prev) prev.addEventListener("click", function () {
-        var r = $('input[name="reponse"]:checked', form);
-        if (r) state.rep[q.id] = r.value === "null" ? null : Number(r.value);
-        state.imp[q.id] = $("#quiz-important").checked;
-        state.i--; save(); etape();
-      });
-      $("#quiz-stop").addEventListener("click", function () { save(); intro(); focusTitre(); window.scrollTo(0, 0); });
-      window.scrollTo(0, root.getBoundingClientRect().top + window.pageYOffset - 16);
+      if (prev) prev.addEventListener("click", function () { enregistrer(); state.i--; save(); etape(); });
+      $("#quiz-stop").addEventListener("click", function () { enregistrer(); save(); intro(); window.scrollTo(0, 0); });
+      haut();
       focusTitre();
     }
 
+    /* Calcul */
+    function accord(u, v) { return 1 - Math.abs(u - v) / 4; }
+
     function calculer() {
+      var qs = liste();
       return G.candidats.map(function (c) {
-        var num = 0, den = 0, n = 0;
-        Q.questions.forEach(function (q) {
+        var num = 0, den = 0, n = 0, parTheme = {}, details = [];
+        qs.forEach(function (q) {
           var u = state.rep[q.id];
           var v = q.positions[c.id];
           if (u === null || u === undefined || v === null || v === undefined) return;
-          var w = state.imp[q.id] ? 2 : 1;
-          num += w * (1 - Math.abs(u - v) / 4);
-          den += w;
-          n++;
+          var w = state.imp[q.id] == null ? 1 : state.imp[q.id];
+          var a = accord(u, v);
+          num += w * a; den += w; n++;
+          var pt = parTheme[q.theme] || (parTheme[q.theme] = { num: 0, den: 0 });
+          pt.num += w * a; pt.den += w;
+          details.push({ q: q, u: u, v: v, w: w, ecart: Math.abs(u - v) });
         });
-        return { c: c, score: den ? Math.round((num / den) * 100) : null, n: n };
+        var themes = {};
+        Object.keys(parTheme).forEach(function (k) { themes[k] = Math.round(parTheme[k].num / parTheme[k].den * 100); });
+        return { c: c, score: den ? Math.round((num / den) * 100) : null, n: n, themes: themes, details: details };
       }).sort(function (a, b) { return (b.score === null ? -1 : b.score) - (a.score === null ? -1 : a.score); });
     }
+
+    // Accords nets (même sens, réponse tranchée) et désaccords nets (sens opposés)
+    function accords(r) {
+      return r.details.filter(function (d) { return d.ecart <= 1 && d.u !== 0 && d.v !== 0 && (d.u > 0) === (d.v > 0); })
+        .sort(function (a, b) { return (b.w - a.w) || (a.ecart - b.ecart); }).slice(0, 4);
+    }
+    function desaccords(r) {
+      return r.details.filter(function (d) { return d.ecart >= 2 && d.u * d.v < 0 || d.ecart >= 3; })
+        .sort(function (a, b) { return (b.w * b.ecart - a.w * a.ecart); }).slice(0, 4);
+    }
+
+    function minuscule(label) { return /^Europe/.test(label) ? label : label.charAt(0).toLowerCase() + label.slice(1); }
 
     function libelle(v) {
       if (v === null || v === undefined) return "Sans opinion / inconnue";
       for (var i = 0; i < Q.echelle.length; i++) if (Q.echelle[i].valeur === v) return Q.echelle[i].label;
       return "Position nuancée";
     }
+    function libellePosition(v) {
+      if (v === 0) return "Position nuancée";
+      return libelle(v);
+    }
 
+    function listeQuestions(items) {
+      return "<ul>" + items.map(function (d) {
+        return "<li>" + esc(d.q.texte) + ' <span class="mention">(vous : ' + esc(libelle(d.u).toLowerCase()) + " ; candidat : " + esc(libellePosition(d.v).toLowerCase()) + ")</span></li>";
+      }).join("") + "</ul>";
+    }
+
+    /* Résultats */
     function resultats() {
+      var qs = liste();
+      var total = qs.length;
       var res = calculer();
-      var repondu = Q.questions.filter(function (q) { return state.rep[q.id] !== null && state.rep[q.id] !== undefined; }).length;
+      var repondu = qs.filter(function (q) { return state.rep[q.id] !== null && state.rep[q.id] !== undefined; }).length;
 
       if (repondu === 0) {
         root.innerHTML = '<h2 id="quiz-focus" tabindex="-1">Aucun résultat</h2><p>Vous avez répondu « Sans opinion » à toutes les questions : il n\'est pas possible de calculer une proximité.</p><div class="btn-group"><button type="button" class="btn" id="quiz-restart">Recommencer le questionnaire</button></div>';
-        $("#quiz-restart").addEventListener("click", function () { state = { i: 0, rep: {}, imp: {} }; save(); etape(); });
+        $("#quiz-restart").addEventListener("click", function () { state = vide(state.mode); save(); intro(); focusTitre(); });
         focusTitre();
         return;
       }
 
+      var premier = res[0], second = res[1];
+      var ecart = premier.score - second.score;
+      var themesTries = Object.keys(premier.themes).sort(function (a, b) { return premier.themes[b] - premier.themes[a]; });
+      var top5 = res.slice(0, 5);
+
+      var synthese =
+        '<section class="verdict" aria-labelledby="verdict-titre">' +
+        '<div class="verdict__head">' + avatar(premier.c, "lg") +
+        '<div><p class="verdict__kicker">Le candidat le plus proche de vos réponses</p>' +
+        '<h3 class="verdict__name" id="verdict-titre">' + esc(premier.c.nom) + "</h3>" +
+        '<p class="verdict__party">' + esc(parti(premier.c.parti).nom) + "</p>" +
+        '<p class="verdict__score">' + premier.score + ' %<span class="sr-only"> de proximité</span></p></div></div>' +
+        "<p>" + (ecart <= 3
+          ? "<strong>Résultat très serré :</strong> " + esc(second.c.nom) + " n'est qu'à " + ecart + " point" + (ecart > 1 ? "s" : "") + " (" + second.score + " %). Vos idées se situent entre ces deux candidats : comparez leurs programmes sur les thèmes qui comptent le plus pour vous."
+          : ecart <= 8
+            ? "Suivi de " + esc(second.c.nom) + " (" + second.score + " %, à " + ecart + " points). L'écart est net mais modéré."
+            : "Nettement devant " + esc(second.c.nom) + " (" + second.score + " %, à " + ecart + " points).") + "</p>" +
+        (themesTries.length > 1
+          ? "<p>Vous êtes particulièrement en phase avec " + esc(premier.c.nom) + " sur <strong>" + esc(minuscule(theme(themesTries[0]).label)) + "</strong> (" + premier.themes[themesTries[0]] + " %)" +
+            (themesTries.length > 2 ? " et <strong>" + esc(minuscule(theme(themesTries[1]).label)) + "</strong> (" + premier.themes[themesTries[1]] + " %)" : "") +
+            ", et moins en accord sur <strong>" + esc(minuscule(theme(themesTries[themesTries.length - 1]).label)) + "</strong> (" + premier.themes[themesTries[themesTries.length - 1]] + " %).</p>"
+          : "") +
+        (desaccords(premier).length
+          ? '<p class="explain__title">Vos principaux désaccords avec ' + esc(premier.c.nom) + "</p>" + listeQuestions(desaccords(premier).slice(0, 3))
+          : "") +
+        '<p><a class="btn btn--sm" href="candidat.html?id=' + premier.c.id + '">Lire le programme de ' + esc(premier.c.nom) + "</a></p>" +
+        "</section>";
+
+      var tableauThemes =
+        '<div class="table-wrap" tabindex="0" role="region" aria-labelledby="cap-themes"><table class="table-themes">' +
+        '<caption id="cap-themes">Votre proximité par thème avec les cinq candidats les plus proches</caption>' +
+        '<thead><tr><th scope="col">Thème</th>' + top5.map(function (r) { return '<th scope="col">' + esc(r.c.nom) + "</th>"; }).join("") + "</tr></thead><tbody>" +
+        G.themes.filter(function (t) { return top5.some(function (r) { return r.themes[t.id] != null; }); }).map(function (t) {
+          var best = Math.max.apply(null, top5.map(function (r) { return r.themes[t.id] == null ? -1 : r.themes[t.id]; }));
+          return '<tr><th scope="row">' + esc(t.label) + "</th>" + top5.map(function (r) {
+            var s = r.themes[t.id];
+            if (s == null) return "<td>—</td>";
+            return "<td" + (s === best ? ' class="is-best"' : "") + ">" + s + " %" + (s === best ? '<span class="sr-only"> (le plus proche)</span>' : "") + "</td>";
+          }).join("") + "</tr>";
+        }).join("") +
+        "</tbody></table></div>";
+
       root.innerHTML =
         '<h2 id="quiz-focus" tabindex="-1">Vos résultats</h2>' +
-        '<p class="lead">Vous avez exprimé un avis sur ' + repondu + " question" + (repondu > 1 ? "s" : "") + " sur " + total + ". Voici votre degré de proximité avec chaque candidat, du plus proche au plus éloigné.</p>" +
+        '<p class="lead">Vous avez exprimé un avis sur ' + repondu + " question" + (repondu > 1 ? "s" : "") + " sur " + total + " (version " + (state.mode === "complet" ? "complète" : "courte") + ").</p>" +
+        synthese +
         '<div class="callout callout--warning"><p>Un score élevé signifie que vos réponses rejoignent les positions connues du candidat sur ces sujets ; il ne dit rien de ses autres propositions, de sa personnalité ou de sa capacité à gouverner. <strong>Lisez les programmes avant de faire votre choix.</strong></p></div>' +
+        (state.mode !== "complet" ? '<p>Pour un résultat plus précis, vous pouvez <button type="button" class="link-button" id="quiz-complet">passer à la version complète</button> : vos réponses actuelles sont conservées.</p>' : "") +
+        '<h2 style="margin-top:2rem">Proximité par thème</h2>' + tableauThemes +
+        '<h2 style="margin-top:2rem">Classement complet</h2>' +
         '<ol class="results">' +
         res.map(function (r, k) {
           var p = parti(r.c.parti);
           var s = r.score === null ? "—" : r.score + " %";
+          var acc = accords(r), des = desaccords(r);
           return '<li class="result" style="--result-color:' + p.couleur + '">' +
-            '<div class="result__head"><h3 class="result__name person"><span class="result__rank">' + (k + 1) + ".</span>" + avatar(r.c, "md") + esc(r.c.nom) + ' <span class="mention" style="font-weight:400">(' + esc(p.sigle) + ")</span></h3>" +
+            '<div class="result__head"><h3 class="result__name person"><span class="result__rank">' + (k + 1) + ".</span>" + avatar(r.c, "md") + "<span>" + esc(r.c.nom) + ' <span class="mention" style="font-weight:400">(' + esc(p.sigle) + ")</span></span></h3>" +
             '<p class="result__score" style="margin:0"><span class="sr-only">Proximité : </span>' + s + "</p></div>" +
             '<div class="bar" aria-hidden="true"><div class="bar__fill" style="width:' + (r.score || 0) + '%"></div></div>' +
-            '<p class="mention" style="margin-bottom:.5rem">Calculé sur ' + r.n + " question" + (r.n > 1 ? "s" : "") + " où sa position est connue.</p>" +
-            '<details class="accordion"><summary>Détail question par question<span class="sr-only"> pour ' + esc(r.c.nom) + "</span></summary><div class=\"accordion__body\"><div class=\"table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Détail des réponses comparées à " + esc(r.c.nom) + '"><table>' +
+            '<p class="mention" style="margin-bottom:.5rem">Calculé sur ' + r.n + " question" + (r.n > 1 ? "s" : "") + " où sa position est connue" + (r.n < repondu * 0.8 ? " — fiabilité réduite, sa position étant inconnue sur plusieurs sujets" : "") + ".</p>" +
+            '<details class="accordion"><summary>Accords, désaccords et détail<span class="sr-only"> pour ' + esc(r.c.nom) + "</span></summary><div class=\"accordion__body\">" +
+            '<div class="args">' +
+            '<div class="args__col args__col--pour"><p class="explain__title">Vous êtes d\'accord sur</p>' + (acc.length ? listeQuestions(acc) : "<p>Aucun accord net.</p>") + "</div>" +
+            '<div class="args__col args__col--contre"><p class="explain__title">Vous divergez sur</p>' + (des.length ? listeQuestions(des) : "<p>Aucun désaccord net.</p>") + "</div></div>" +
+            '<div class="table-wrap" tabindex="0" role="region" aria-label="Détail des réponses comparées à ' + esc(r.c.nom) + '"><table>' +
             '<caption class="sr-only">Vos réponses comparées aux positions de ' + esc(r.c.nom) + "</caption>" +
             '<thead><tr><th scope="col">Affirmation</th><th scope="col">Votre réponse</th><th scope="col">Position de ' + esc(r.c.nom) + "</th></tr></thead><tbody>" +
-            Q.questions.map(function (q) {
-              return '<tr><th scope="row" style="font-weight:400">' + esc(q.texte) + (state.imp[q.id] ? ' <span class="badge">Important</span>' : "") + "</th><td>" + esc(libelle(state.rep[q.id])) + "</td><td>" + esc(libelle(q.positions[r.c.id])) + "</td></tr>";
+            qs.map(function (q) {
+              var w = state.imp[q.id];
+              return '<tr><th scope="row" style="font-weight:400">' + esc(q.texte) + (w === 2 ? ' <span class="badge">Prioritaire</span>' : "") + "</th><td>" + esc(libelle(state.rep[q.id])) + "</td><td>" + esc(libellePosition(q.positions[r.c.id])) + "</td></tr>";
             }).join("") +
             "</tbody></table></div>" +
             '<p><a href="candidat.html?id=' + r.c.id + '">Lire le programme de ' + esc(r.c.nom) + "</a></p></div></details>" +
@@ -583,14 +708,51 @@
         '<button type="button" class="btn btn--tertiary" id="quiz-print">Imprimer mes résultats</button>' +
         "</div>";
 
+      var complet = $("#quiz-complet");
+      if (complet) complet.addEventListener("click", function () {
+        state.mode = "complet";
+        // Reprendre à la première question sans réponse
+        var qsC = liste();
+        state.i = 0;
+        for (var i = 0; i < qsC.length; i++) { if (!(qsC[i].id in state.rep)) { state.i = i; break; } }
+        save(); etape();
+      });
       $("#quiz-modifier").addEventListener("click", function () { state.i = 0; save(); etape(); });
-      $("#quiz-restart").addEventListener("click", function () { state = { i: 0, rep: {}, imp: {} }; save(); etape(); });
+      $("#quiz-restart").addEventListener("click", function () { state = vide(state.mode); save(); intro(); focusTitre(); window.scrollTo(0, 0); });
       $("#quiz-print").addEventListener("click", function () { window.print(); });
-      window.scrollTo(0, root.getBoundingClientRect().top + window.pageYOffset - 16);
+      haut();
       focusTitre();
     }
 
     intro();
+  }
+
+  /* ---------- Lexique ---------- */
+
+  function pageLexique() {
+    var el = $("#glossaire");
+    if (!el) return;
+    var items = (G.lexique || []).slice().sort(function (a, b) { return a.terme.localeCompare(b.terme, "fr"); });
+    var lettres = [];
+    var html = "";
+    var courante = "";
+    items.forEach(function (e) {
+      var l = e.terme.charAt(0).toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+      if (/[0-9]/.test(l)) l = "#";
+      if (l !== courante) {
+        if (courante) html += "</dl></section>";
+        courante = l;
+        lettres.push(l);
+        html += '<section class="glossary__section" aria-labelledby="lettre-' + (l === "#" ? "chiffres" : l) + '"><h2 id="lettre-' + (l === "#" ? "chiffres" : l) + '">' + (l === "#" ? "0-9" : l) + '</h2><dl class="glossary">';
+      }
+      html += '<dt id="terme-' + e.id + '">' + esc(e.terme) + "</dt><dd>" + esc(e.def) + "</dd>";
+    });
+    if (courante) html += "</dl></section>";
+    $("#lettres").innerHTML = lettres.map(function (l) {
+      var id = l === "#" ? "chiffres" : l;
+      return '<li><a href="#lettre-' + id + '">' + (l === "#" ? "0-9" : l) + "</a></li>";
+    }).join("");
+    el.innerHTML = html;
   }
 
   /* ---------- Plan du site ---------- */
@@ -619,7 +781,7 @@
   var PAGES = {
     accueil: pageAccueil, election: pageElection, partis: pagePartis, candidats: pageCandidats,
     candidat: pageCandidat, comparateur: pageComparateur, questionnaire: pageQuestionnaire,
-    plan: pagePlan, sources: pageSources
+    plan: pagePlan, sources: pageSources, lexique: pageLexique
   };
 
   function init() {

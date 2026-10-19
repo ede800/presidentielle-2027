@@ -39,7 +39,7 @@
       <section class="section" aria-labelledby="t-calcul">
         <h2 id="t-calcul">Comment le questionnaire est-il calculé ?</h2>
         <p>Pour chaque affirmation, la position de chaque candidat est codée sur une échelle de −2 (pas du tout d'accord) à +2 (tout à fait d'accord), à partir des propositions recensées. Lorsque la position d'un candidat est inconnue, la question est ignorée pour lui.</p>
-        <p>Pour chaque question à laquelle vous avez répondu, l'accord est égal à 1 moins l'écart entre votre réponse et la position du candidat, divisé par 4 (écart maximal). Une réponse identique vaut donc 100 %, une réponse opposée 0 %. Les questions marquées comme importantes comptent double. Le score final est la moyenne pondérée de ces accords.</p>
+        <p>Pour chaque question à laquelle vous avez répondu, l'accord est égal à 1 moins l'écart entre votre réponse et la position du candidat, divisé par 4 (écart maximal). Une réponse identique vaut donc 100 %, une réponse opposée 0 %. Chaque question est pondérée selon l'importance que vous lui donnez : secondaire (×0,5), normale (×1) ou prioritaire (×2). La réponse « Ni d'accord, ni pas d'accord » est prise en compte comme une position neutre. Le score final est la moyenne pondérée de ces accords.</p>
         <p>Les réponses « Sans opinion » ne sont pas prises en compte. Vos réponses sont conservées uniquement dans le stockage local de votre navigateur, pour vous permettre de reprendre le questionnaire ; elles ne sont jamais transmises.</p>
         <div class="callout callout--warning"><p>Ce codage est forcément une simplification. Un même candidat peut avoir une position nuancée, conditionnelle ou évolutive. Le questionnaire est un point de départ pour lire les programmes, pas un substitut.</p></div>
       </section>
@@ -68,6 +68,7 @@
   <script src="js/data.js"></script>
   <script src="js/questionnaire-data.js"></script>
   <script src="js/portraits.js"></script>
+  <script src="js/lexique.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
